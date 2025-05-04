@@ -9,8 +9,9 @@ public class CustomNetworkManager : NetworkManager
     {
         ItemDatabase.Initialize();
         
-        var instance = Instantiate(spawnPrefabs.Find(prefab => prefab.name == "item"));
+        var instance = Instantiate(spawnPrefabs.Find(prefab => prefab.name == "Pistol"));
         NetworkServer.Spawn(instance);
+        
 
         base.OnStartServer();
     }

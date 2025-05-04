@@ -201,6 +201,9 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs:
   - {fileID: 8980209935840170822, guid: 0e3eb5431246c0a4d9ca511364aa5198, type: 3}
+  - {fileID: 5541692597822779500, guid: a5e3b4b4a2675c144b6b255ae6269995, type: 3}
+  - {fileID: 847801755137122784, guid: 1589e036616c10b4491b6619876c6b7d, type: 3}
+  - {fileID: 8980209935840170822, guid: 750fc863c9dcbe74fa5fb47745e237f3, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -685,7 +688,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0
