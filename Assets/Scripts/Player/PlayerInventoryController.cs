@@ -4,12 +4,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using static Helper;
 
-[RequireComponent(typeof(Player), typeof(Inventory))]
+[RequireComponent(typeof(PlayerManager), typeof(Inventory))]
 public class PlayerInventoryController : NetworkBehaviour
 {
     private Inventory inv => GetComponent<Inventory>();
-    private Player player => GetComponent<Player>();
-    private Transform cam => player.Cam;
+    private PlayerManager PlayerManager => GetComponent<PlayerManager>();
+    private Transform cam => PlayerManager.Cam;
 
     [SerializeField] [SyncVar] private int curInvSlot;
 
