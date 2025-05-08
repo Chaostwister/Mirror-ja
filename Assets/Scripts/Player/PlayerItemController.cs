@@ -7,6 +7,7 @@ using static Helper;
 [RequireComponent(typeof(PlayerInventoryController), typeof(Inventory))]
 public class PlayerItemController : NetworkBehaviour
 {
+    public PlayerManager manager => GetComponent<PlayerManager>();
     private PlayerInventoryController playerInvContr => GetComponent<PlayerInventoryController>();
     private Inventory inv => GetComponent<Inventory>();
 
@@ -32,11 +33,8 @@ public class PlayerItemController : NetworkBehaviour
         equippedItem.transform.forward = connectionPoint.forward;
 
         var item = equippedItem.GetComponent<Item>();
-
-        if (Input.GetMouseButton(0))
-        {
-            item.OnLeftClick();
-        }
+        
+        item.WhileEquipped();
     }
     
     [Server]
@@ -51,11 +49,18 @@ public class PlayerItemController : NetworkBehaviour
        equippedItem.GetComponent<Item>().IsEquipped = true;
        
        RpcOnNewEquipped(equippedItem);
+       TargetRpcSetupItem(equippedItem);
     }
 
     [ClientRpc]
     private void RpcOnNewEquipped(GameObject equipped)
     {
         equipped.GetComponent<Collider>().enabled = false;
+    }
+
+    [TargetRpc]
+    private void TargetRpcSetupItem(GameObject equipped)
+    {
+        equipped.GetComponent<Item>().OnEquip(this);
     }
 }

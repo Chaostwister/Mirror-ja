@@ -9,6 +9,8 @@ public class PlayerManager : NetworkBehaviour
 
     public bool inUI;
 
+    [SerializeField] private GameObject crossHair;
+
     private void Start()
     {
         if (!isLocalPlayer) return;
@@ -29,7 +31,7 @@ public class PlayerManager : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.G))
         {
-            CmdSpawnItem("item sphere");
+            CmdSpawnItem("sphere item");
         }
     }
 
@@ -53,6 +55,8 @@ public class PlayerManager : NetworkBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
+
+        crossHair.SetActive(!Input.GetMouseButton(1));
     }
 
 

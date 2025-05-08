@@ -161,6 +161,7 @@ MonoBehaviour:
   syncInterval: 0
   cam: {fileID: 5350380178622067053}
   inUI: 0
+  crossHair: {fileID: 1366721097731241398}
 --- !u!114 &-4928551369302787547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,9 +177,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  forwardMovementAccel: 200
-  sidewaysMovementAccel: 200
-  maxSpeed: 50
+  forwardMovementAccel: 50
+  sidewaysMovementAccel: 50
+  maxSpeed: 5
   sprintMovementMultiplier: 2
   sens: 100
   yClamp: {x: -90, y: 90}

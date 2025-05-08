@@ -15,7 +15,9 @@ public abstract class Item : NetworkBehaviour
         rb.isKinematic = IsEquipped;
     }
 
-    public abstract void OnLeftClick();
-    public abstract void OnRightClick();
-
+    public virtual void OnEquip(PlayerItemController itemController)
+    {
+        //default impl
+    }
+    public abstract void WhileEquipped();
 }
