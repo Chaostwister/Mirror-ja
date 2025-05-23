@@ -1,5 +1,6 @@
 using UnityEngine;
 using Mirror;
+using UnityEditor;
 
 public static class Helper
 {
@@ -31,5 +32,10 @@ public static class Helper
         instance.transform.position = position;
         NetworkServer.Spawn(instance, conn);
         return instance;
+    }
+
+    public static void Y(this Vector3 vec, float newY)
+    {
+        vec = new Vector3(vec.x, newY, vec.z);
     }
 }

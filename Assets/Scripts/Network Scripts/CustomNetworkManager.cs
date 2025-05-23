@@ -1,26 +1,38 @@
+using System.Collections.Generic;
 using Mirror;
+using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Serialization;
+using static Helper;
 
-public class CustomNetworkManager : NetworkManager
+namespace Network_Scripts
 {
-    [SerializeField] private GameObject ServerCam;
-
-    public override void OnStartServer()
+    public class CustomNetworkManager : NetworkManager
     {
-        ItemDatabase.Initialize();
-        
-        var instance = Instantiate(spawnPrefabs.Find(prefab => prefab.name == "Pistol"));
-        NetworkServer.Spawn(instance);
+        [SerializeField] private List<GameObject> spawns;
+        [SerializeField] private GameObject serverCam;
+
+        public GameObject ServerCam => serverCam;
+
+        public override void OnStartServer()
+        {
+            ItemDatabase.Initialize();
+
+            foreach (var o in spawns)
+            {
+                NetworkInstantiate(o);
+            }
         
 
-        base.OnStartServer();
-    }
+            base.OnStartServer();
+        }
 
-    public override void OnClientConnect()
-    {
-        ItemDatabase.Initialize();
+        public override void OnClientConnect()
+        {
+            ItemDatabase.Initialize();
         
-        ServerCam.SetActive(false);
-        base.OnClientConnect();
+            ServerCam.SetActive(false);
+            base.OnClientConnect();
+        }
     }
 }

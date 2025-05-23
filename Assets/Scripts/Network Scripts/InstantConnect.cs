@@ -1,22 +1,23 @@
-using System;
 using Mirror;
 using Mirror.Discovery;
-using Unity.VisualScripting;
 using UnityEngine;
 
-[RequireComponent(typeof(NetworkDiscovery))]
-public class InstantConnect : MonoBehaviour
+namespace Network_Scripts
 {
-    private NetworkDiscovery networkDiscovery => GetComponent<NetworkDiscovery>();
-
-    private void Start()
+    [RequireComponent(typeof(NetworkDiscovery))]
+    public class InstantConnect : MonoBehaviour
     {
-        networkDiscovery.OnServerFound.AddListener(ConnectToFoundServer);
-    }
+        private NetworkDiscovery networkDiscovery => GetComponent<NetworkDiscovery>();
 
-    public void ConnectToFoundServer(ServerResponse info)
-    {
-        networkDiscovery.StopDiscovery();
-        NetworkManager.singleton.StartClient(info.uri);
+        private void Start()
+        {
+            networkDiscovery.OnServerFound.AddListener(ConnectToFoundServer);
+        }
+
+        public void ConnectToFoundServer(ServerResponse info)
+        {
+            networkDiscovery.StopDiscovery();
+            NetworkManager.singleton.StartClient(info.uri);
+        }
     }
 }

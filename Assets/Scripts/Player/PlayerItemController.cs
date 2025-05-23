@@ -1,66 +1,76 @@
-﻿using Mirror;
-using Unity.VisualScripting;
+﻿using Items;
+using Mirror;
+using ScriptableObjects;
 using UnityEngine;
 using static System.String;
 using static Helper;
 
-[RequireComponent(typeof(PlayerInventoryController), typeof(Inventory))]
-public class PlayerItemController : NetworkBehaviour
+namespace Player
 {
-    public PlayerManager manager => GetComponent<PlayerManager>();
-    private PlayerInventoryController playerInvContr => GetComponent<PlayerInventoryController>();
-    private Inventory inv => GetComponent<Inventory>();
-
-    [SerializeField] private Transform connectionPoint;
-    [SerializeField] [SyncVar] private GameObject equippedItem;
-
-    private void OnEnable()
+    [RequireComponent(typeof(PlayerInventoryController))]
+    public class PlayerItemController : NetworkBehaviour
     {
-        print($"on enable ran on{(isClientOnly ? "Client" : "Server")}");
-        
-        playerInvContr.ChangedInvSlot += ServerOnSlotChange;
-        
-        if(isServer) ServerOnSlotChange();
-    }
+        public PlayerManager manager => GetComponent<PlayerManager>();
+        private PlayerInventoryController playerInvContr => GetComponent<PlayerInventoryController>();
+        private Inventory inv => GetComponent<Inventory>();
+        public PlayerMovementController movementController => GetComponent<PlayerMovementController>();
 
-    private void Update()
-    {
-        if (!isLocalPlayer) return;
-
-        if (equippedItem == null) return;
+        [SerializeField] private Transform connectionPoint;
+        [SerializeField] [SyncVar] private GameObject equippedItem;
         
-        equippedItem.transform.position = connectionPoint.position;
-        equippedItem.transform.forward = connectionPoint.forward;
 
-        var item = equippedItem.GetComponent<Item>();
+        private void OnEnable()
+        {
+            playerInvContr.ChangedInvSlot += ServerOnSlotChange;
         
-        item.WhileEquipped();
-    }
+            if(isServer) ServerOnSlotChange();
+        }
+
+        private void Update()
+        {
+            if (!isLocalPlayer) return;
+
+            if (equippedItem == null) return;
+        
+            equippedItem.transform.position = connectionPoint.position;
+            equippedItem.transform.forward = connectionPoint.forward;
+
+            var item = equippedItem.GetComponent<Item>();
+        
+            item.WhileEquipped();
+        }
     
-    [Server]
-    private void ServerOnSlotChange()
-    {
-        print("changed slot");
+        [Server]
+        private void ServerOnSlotChange()
+        {
+            //print("changed slot");
         
-        if(equippedItem != null) NetworkServer.Destroy(equippedItem);
+            if(equippedItem != null) NetworkServer.Destroy(equippedItem);
 
-        if (inv.GetItemIDs(playerInvContr.CurInvSlot) == Empty) return;
-       equippedItem = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(playerInvContr.CurInvSlot)).prefab, connectionToClient);
-       equippedItem.GetComponent<Item>().IsEquipped = true;
-       
-       RpcOnNewEquipped(equippedItem);
-       TargetRpcSetupItem(equippedItem);
-    }
+            if (inv.GetItemIDs(playerInvContr.CurInvSlot) == Empty) return;
+            equippedItem = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(playerInvContr.CurInvSlot)).prefab, connectionToClient);
+            equippedItem.GetComponent<Item>().SetIsEquipped(true);
+            
+            if(equippedItem == null) print("null huh what");
+            RpcOnNewEquipped(equippedItem);
+            TargetRpcSetupItem(equippedItem);
+        }
 
-    [ClientRpc]
-    private void RpcOnNewEquipped(GameObject equipped)
-    {
-        equipped.GetComponent<Collider>().enabled = false;
-    }
+        [ClientRpc]
+        private void RpcOnNewEquipped(GameObject equipped)
+        {
+            if (equipped == null)
+            {
+                print("equipped null for some f reason");
+                return;
+            }
+            equipped.GetComponent<Collider>().enabled = false;
+        }
 
-    [TargetRpc]
-    private void TargetRpcSetupItem(GameObject equipped)
-    {
-        equipped.GetComponent<Item>().OnEquip(this);
+        [TargetRpc]
+        private void TargetRpcSetupItem(GameObject equipped)
+        {
+            equipped.GetComponent<Item>().OnEquip(this);
+        }
     }
 }

@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: -2673530074496476411}
   - component: {fileID: 2114214406050850562}
   - component: {fileID: -1473955570558522454}
+  - component: {fileID: -4936539887434930842}
   - component: {fileID: 2947768422228999138}
   - component: {fileID: -1281522237642424524}
   - component: {fileID: 5738490446845439541}
@@ -162,6 +163,14 @@ MonoBehaviour:
   cam: {fileID: 5350380178622067053}
   inUI: 0
   crossHair: {fileID: 1366721097731241398}
+  isActive: 0
+  isRespawning: 0
+  disableOnDeath:
+  - {fileID: -4928551369302787547}
+  - {fileID: -2673530074496476411}
+  - {fileID: 2114214406050850562}
+  - {fileID: -1473955570558522454}
+  - {fileID: -1473955570558522454}
 --- !u!114 &-4928551369302787547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,9 +188,15 @@ MonoBehaviour:
   syncInterval: 0
   forwardMovementAccel: 50
   sidewaysMovementAccel: 50
-  maxSpeed: 5
-  sprintMovementMultiplier: 2
-  sens: 100
+  curMaxSpeed: 0
+  normalMaxSpeed: 5
+  sprintingMaxSpeed: 10
+  jumpForce: 3
+  mouseX: 0
+  mouseY: 0
+  mouseXLayer: 0
+  mouseYLayer: 0
+  sens: 10
   yClamp: {x: -90, y: 90}
 --- !u!114 &-2673530074496476411
 MonoBehaviour:
@@ -235,6 +250,22 @@ MonoBehaviour:
   maxSlots: 2
   ShownItemIDs: []
   ShownItemCount: 
+--- !u!114 &-4936539887434930842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847801755137122784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16b97879165c02443827ff4eb48a317e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  hp: 0
 --- !u!54 &2947768422228999138
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -330,7 +361,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &397639194676266493
 RectTransform:
   m_ObjectHideFlags: 0

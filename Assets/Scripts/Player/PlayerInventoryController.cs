@@ -1,118 +1,122 @@
 using System;
+using Items;
 using Mirror;
-using Unity.VisualScripting;
+using ScriptableObjects;
 using UnityEngine;
 using static Helper;
 
-[RequireComponent(typeof(PlayerManager), typeof(Inventory))]
-public class PlayerInventoryController : NetworkBehaviour
+namespace Player
 {
-    private Inventory inv => GetComponent<Inventory>();
-    private PlayerManager PlayerManager => GetComponent<PlayerManager>();
-    private Transform cam => PlayerManager.Cam;
-
-    [SerializeField] [SyncVar] private int curInvSlot;
-
-    public int CurInvSlot => curInvSlot;
-
-    [SerializeField] private float dropForceMultiplier = 4f;
-
-    public Action ChangedInvSlot;
-
-    // Update is called once per frame
-    private void Update()
+    [RequireComponent(typeof(PlayerManager), typeof(Inventory))]
+    public class PlayerInventoryController : NetworkBehaviour
     {
-        if (!isLocalPlayer) return;
+        private Inventory inv => GetComponent<Inventory>();
+        private PlayerManager PlayerManager => GetComponent<PlayerManager>();
+        private Transform cam => PlayerManager.Cam;
 
-        if (Input.GetKeyDown(KeyCode.E) && Physics.Raycast(cam.position, cam.forward, out var hit))
+        [SerializeField] [SyncVar] private int curInvSlot;
+
+        public int CurInvSlot => curInvSlot;
+
+        [SerializeField] private float dropForceMultiplier = 4f;
+
+        public Action ChangedInvSlot;
+
+        // Update is called once per frame
+        private void Update()
         {
-            hit.transform.TryGetComponent(out Item item);
-            if (item == null) return;
-            CmdPickUpItem(item.gameObject);
-        }
-        else if (Input.GetKeyDown(KeyCode.Q) && inv.GetItemCount(curInvSlot) > 0)
-        {
-            CmdDropItem(cam.forward);
-        }
+            if (!isLocalPlayer) return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            CmdChangeInvSlot(curInvSlot - 1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            CmdChangeInvSlot(curInvSlot + 1);
-        }
-    }
-
-    [Command]
-    private void CmdChangeInvSlot(int slot)
-    {
-        ServerChangeInvSlot(slot);
-    }
-
-    [Server]
-    private void ServerChangeInvSlot(int slot)
-    {
-        print("changing inv slot");
-        curInvSlot = slot;
-
-        if (curInvSlot < 0) curInvSlot = inv.MaxSlots - 1;
-        else if (curInvSlot >= inv.MaxSlots) curInvSlot = 0;
-
-        ChangedInvSlot.Invoke();
-    }
-
-    [Command]
-    public void CmdPickUpItem(GameObject hit)
-    {
-        var itemID = hit.GetComponent<Item>().data.id;
-        
-        //when inv is full switch items  
-        if (inv.IsFull(itemID))
-        {
-            print("inv full");
-            while (inv.IsFull(itemID))
+            if (Input.GetKeyDown(KeyCode.E) && Physics.Raycast(cam.position, cam.forward, out var hit))
             {
-                DropItem(transform.forward);
+                hit.transform.TryGetComponent(out Item item);
+                if (item == null) return;
+                CmdPickUpItem(item.gameObject);
+            }
+            else if (Input.GetKeyDown(KeyCode.Q) && inv.GetItemCount(curInvSlot) > 0)
+            {
+                CmdDropItem(cam.forward);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                CmdChangeInvSlot(curInvSlot - 1);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                CmdChangeInvSlot(curInvSlot + 1);
             }
         }
-        else curInvSlot = inv.FindSlotForItem(curInvSlot,itemID);
+
+        [Command]
+        private void CmdChangeInvSlot(int slot)
+        {
+            ServerChangeInvSlot(slot);
+        }
+
+        [Server]
+        private void ServerChangeInvSlot(int slot)
+        {
+            //print("changing inv slot");
+            curInvSlot = slot;
+
+            if (curInvSlot < 0) curInvSlot = inv.MaxSlots - 1;
+            else if (curInvSlot >= inv.MaxSlots) curInvSlot = 0;
+
+            ChangedInvSlot.Invoke();
+        }
+
+        [Command]
+        public void CmdPickUpItem(GameObject hit)
+        {
+            var itemID = hit.GetComponent<Item>().itemData.id;
+        
+            //when inv is full switch items  
+            if (inv.IsFull(itemID))
+            {
+                print("inv full");
+                while (inv.IsFull(itemID))
+                {
+                    DropItem(transform.forward);
+                }
+            }
+            else curInvSlot = inv.FindSlotForItem(curInvSlot,itemID);
 
         
-        //assign to slot
-        inv.SetItemIDs(curInvSlot, itemID);
-        inv.SetItemCount(curInvSlot, inv.GetItemCount(curInvSlot) + 1);
-        NetworkServer.Destroy(hit);
+            //assign to slot
+            inv.SetItemIDs(curInvSlot, itemID);
+            inv.SetItemCount(curInvSlot, inv.GetItemCount(curInvSlot) + 1);
+            NetworkServer.Destroy(hit);
         
         
-        ChangedInvSlot.Invoke();
-    }
+            ChangedInvSlot.Invoke();
+        }
 
-    [Command]
-    public void CmdDropItem(Vector3 dir)
-    {
-        DropItem(dir);
-    }
+        [Command]
+        public void CmdDropItem(Vector3 dir)
+        {
+            DropItem(dir);
+        }
 
-    [Server]
-    private void DropItem(Vector3 dir)
-    {
-        var item = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(curInvSlot)).prefab, connectionToClient,
-            cam.position + dir);
-        RpcAddForce(item, dir * dropForceMultiplier, ForceMode.VelocityChange);
+        [Server]
+        private void DropItem(Vector3 dir)
+        {
+            var item = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(curInvSlot)).prefab, connectionToClient,
+                cam.position + dir);
+            RpcAddForce(item, dir * dropForceMultiplier, ForceMode.VelocityChange);
 
-        inv.SetItemCount(curInvSlot, inv.GetItemCount(curInvSlot) - 1);
-        if (inv.GetItemCount(curInvSlot) < 1) inv.SetItemIDs(curInvSlot, String.Empty);
+            inv.SetItemCount(curInvSlot, inv.GetItemCount(curInvSlot) - 1);
+            if (inv.GetItemCount(curInvSlot) < 1) inv.SetItemIDs(curInvSlot, String.Empty);
         
-        ChangedInvSlot.Invoke();
-    }
+            ChangedInvSlot.Invoke();
+        }
 
-    [TargetRpc]
-    public void RpcAddForce(GameObject obj, Vector3 force, ForceMode forceMode)
-    {
-        var rb = obj.GetComponent<Rigidbody>();
-        rb.isKinematic = false;
-        rb.AddForce(force, forceMode);
+        [TargetRpc]
+        public void RpcAddForce(GameObject obj, Vector3 force, ForceMode forceMode)
+        {
+            var rb = obj.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+            rb.AddForce(force, forceMode);
+        }
     }
 }

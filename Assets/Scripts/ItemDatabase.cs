@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ScriptableObjects;
 using UnityEngine;
 
 public static class ItemDatabase
@@ -22,7 +23,7 @@ public static class ItemDatabase
             i++;
         }
         
-        Debug.Log($"Initialized {i} Item{(i > 1 ? "s":"")} in Item Database");
+        //Debug.Log($"Initialized {i} Item{(i > 1 ? "s":"")} in Item Database");
     }
 
     public static ItemData GetItem(string id)
@@ -34,7 +35,7 @@ public static class ItemDatabase
             return null;
         }
         
-        Debug.Log($"Fetched Item {id} from Database");
+        //Debug.Log($"Fetched Item {id} from Database");
         return item;
     }
 }

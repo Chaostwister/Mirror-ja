@@ -58,7 +58,7 @@ public class Inventory : NetworkBehaviour
 
     public string GetItemIDs(int i)
     {
-        print("called GetItemIds");
+        //print("called GetItemIds");
         if (i < 0 || i > itemIDs.Count)
         {
             Debug.LogError($"GetItemIDs failed bc i:{i} is invalid");
@@ -70,7 +70,7 @@ public class Inventory : NetworkBehaviour
 
     public int GetItemCount(int i)
     {
-        print("called GetItemCount");
+        //print("called GetItemCount");
         if (i < 0 || i > itemIDs.Count)
         {
             Debug.LogError($"GetItemCount failed bc i:{i} is invalid");
@@ -82,7 +82,7 @@ public class Inventory : NetworkBehaviour
 
     public void SetItemIDs(int i, string value)
     {
-        print("called SetItemIDs");
+        //print("called SetItemIDs");
         if (i < 0 || i > itemIDs.Count)
         {
             Debug.LogError($"SetItemIDs failed bc i:{i} is invalid");
@@ -94,7 +94,7 @@ public class Inventory : NetworkBehaviour
 
     public void SetItemCount(int i, int value)
     {
-        print("called SetItemCount");
+        //print("called SetItemCount");
         if (i < 0 || i > itemIDs.Count)
         {
             Debug.LogError($"GetItemCount failed bc i:{i} is invalid");
