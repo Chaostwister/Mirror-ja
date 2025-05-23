@@ -12,6 +12,7 @@ namespace Player
     {
         private Inventory inv => GetComponent<Inventory>();
         private PlayerManager PlayerManager => GetComponent<PlayerManager>();
+        private PlayerItemController itemController => GetComponent<PlayerItemController>();
         private Transform cam => PlayerManager.Cam;
 
         [SerializeField] [SyncVar] private int curInvSlot;
@@ -101,9 +102,14 @@ namespace Player
         [Server]
         private void DropItem(Vector3 dir)
         {
-            var item = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(curInvSlot)).prefab, connectionToClient,
-                cam.position + dir);
-            RpcAddForce(item, dir * dropForceMultiplier, ForceMode.VelocityChange);
+            // var item = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(curInvSlot)).prefab, connectionToClient,
+            //     cam.position + dir);
+            
+            itemController.equippedItem.GetComponent<Item>().SetIsEquipped(false);
+            itemController.equippedItem.GetComponent<Collider>().enabled = true;
+            
+            RpcAddForce(itemController.equippedItem, dir * dropForceMultiplier, ForceMode.VelocityChange);
+            itemController.equippedItem = null;
 
             inv.SetItemCount(curInvSlot, inv.GetItemCount(curInvSlot) - 1);
             if (inv.GetItemCount(curInvSlot) < 1) inv.SetItemIDs(curInvSlot, String.Empty);

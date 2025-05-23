@@ -35,7 +35,6 @@ namespace Player
 
             if (!isLocalPlayer) return;
             crossHair.SetActive(true);
-            Test();
             cam.GetComponent<Camera>().enabled = true;
             cam.GetComponent<AudioListener>().enabled = true;
 
@@ -43,12 +42,6 @@ namespace Player
             Cursor.visible = false;
             
             OnSpawn();
-        }
-
-        [Command]
-        private void Test()
-        {
-            print("ran on server fine");
         }
 
         private void Update()

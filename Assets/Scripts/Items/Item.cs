@@ -13,12 +13,12 @@ namespace Items
     {
         [SerializeField] public ItemData itemData;
 
-        [ReadOnly] [SerializeField][SyncVar] private bool IsEquipped;
+        [ReadOnly] [SerializeField][SyncVar] private bool isEquipped;
         public Rigidbody rb => GetComponent<Rigidbody>();
 
         public override void OnStartAuthority()
         {
-            rb.isKinematic = IsEquipped;
+            rb.isKinematic = isEquipped;
         }
 
         public virtual void OnEquip(PlayerItemController itemController)
@@ -29,7 +29,7 @@ namespace Items
 
         public void SetIsEquipped(bool isEquipped)
         {
-            IsEquipped = isEquipped;
+            this.isEquipped = isEquipped;
         }
     }
 }

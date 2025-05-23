@@ -16,7 +16,7 @@ namespace Player
         public PlayerMovementController movementController => GetComponent<PlayerMovementController>();
 
         [SerializeField] private Transform connectionPoint;
-        [SerializeField] [SyncVar] private GameObject equippedItem;
+        [SerializeField] [SyncVar] public GameObject equippedItem;
         
 
         private void OnEnable()
@@ -44,14 +44,11 @@ namespace Player
         private void ServerOnSlotChange()
         {
             //print("changed slot");
-        
-            if(equippedItem != null) NetworkServer.Destroy(equippedItem);
 
             if (inv.GetItemIDs(playerInvContr.CurInvSlot) == Empty) return;
-            equippedItem = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(playerInvContr.CurInvSlot)).prefab, connectionToClient);
+            equippedItem = NetworkInstantiate(ItemDatabase.GetItem(inv.GetItemIDs(playerInvContr.CurInvSlot)).prefab, connectionToClient, connectionPoint.position);
             equippedItem.GetComponent<Item>().SetIsEquipped(true);
             
-            if(equippedItem == null) print("null huh what");
             RpcOnNewEquipped(equippedItem);
             TargetRpcSetupItem(equippedItem);
         }
@@ -59,11 +56,6 @@ namespace Player
         [ClientRpc]
         private void RpcOnNewEquipped(GameObject equipped)
         {
-            if (equipped == null)
-            {
-                print("equipped null for some f reason");
-                return;
-            }
             equipped.GetComponent<Collider>().enabled = false;
         }
 
